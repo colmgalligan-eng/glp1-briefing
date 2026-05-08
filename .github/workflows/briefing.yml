@@ -1,0 +1,30 @@
+name: GLP-1 Daily Briefing
+
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'   # 7:30 AM Irish time (UTC+1), Monâ€“Fri
+    # Change to '30 6 * * *' if you want weekends too
+  workflow_dispatch:          # also allows manual trigger from GitHub UI
+
+jobs:
+  send-briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run briefing
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: node briefing.js
